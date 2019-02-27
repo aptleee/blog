@@ -1,37 +1,63 @@
-## Welcome to GitHub Pages
+# DFA
 
-You can use the [editor on GitHub](https://github.com/aptleee/blog/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+### Construct a DFA
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+<pre>
+  	R, m := 256, len(p)
+	dfa := make([][]int, R) 
+	for i := 0; i < R; i++ {
+		dfa[i] = make([]int, m)
+	}
 
-### Markdown
+	dfa[p[0]][0] = 1
+	for x, j := 0, 1; j < m; j++ { 
+		for c := 0; c < R; c++ {
+			dfa[c][j] = dfa[c][x]
+		}
+		dfa[p[j]][j] = j+1
+		x = dfa[p[j]][x]
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+	}
+</pre>
 
-```markdown
-Syntax highlighted code block
+### what does x = dfa[p[j]][x] mean?
+Few properties to understand X:<br/>
+1.X can only increment 1 by 1, but it can drop to 0 or 1 suddenly.<br/>
 
-# Header 1
-## Header 2
-### Header 3
+2.when will X become 1?<br/>
+X is initialized to 0<br/>
+when we encounter a character in the pattern that is the same as the first character in pattern.
 
-- Bulleted
-- List
+3.when will X increment?<br/>
+when character at X+1 is the same as character at p[j]
 
-1. Numbered
-2. List
+4.when will X drop to 0?<br/>
+when we encounter a character that has not showed up in the pattern before
 
-**Bold** and _Italic_ and `Code` text
+so for any character (state) in the pattern, its restart state X either be 0 or the index of the same character to the left of it. If there are multiple, it should be the first one.
 
-[Link](url) and ![Image](src)
-```
+consider following situations:
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+<pre>
+0 1 2 3 4 5 6 7 <br/>
+  A B C E A B C
+</pre>
 
-### Jekyll Themes
+for 1(A), 2(B), 3(C), 4(E), their restart state is 0<br/>
+for 5(A), its restart state is 1(A)<br/>
+for 6(B), its restart state is 2(B)<br/>
+for 7(C), its restart state is 3(C)<br/>
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/aptleee/blog/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+the reason is: if there is a mismatch as following:
 
-### Support or Contact
+s: A B C E A B D<br/>
+p: A B C E A B C
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+the next state should be:
+
+<pre>
+s: A B C E A B D<br/>
+p:         A B C E A B D<br/>
+and then compare D and C
+</pre>
+
