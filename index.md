@@ -9,7 +9,7 @@
 		dfa[i] = make([]int, m)
 	}
 
-	dfa[p[0]][0]] = 1
+	dfa[p[0]][0] = 1
 	for x, j := 0, 1; j < m; j++ { 
 		for c := 0; c < R; c++ {
 			dfa[c][j] = dfa[c][x]
